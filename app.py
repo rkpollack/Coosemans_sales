@@ -19,7 +19,7 @@ def webhook():
     print("Request:")
     print(json.dumps(req, indent=4))
 
-    res = processRequest(req)
+    res = processRequest2(req)
 
     res = json.dumps(res, indent=4)
     # print(res)
@@ -27,6 +27,37 @@ def webhook():
     r.headers['Content-Type'] = 'application/json'
     return r
 
+def processRequest2(req):
+    if req.get("result").get("action") != "coosemansMarketSales":
+        return {}
+    mkt_url = "http://1webblvd.com/mktsale5.php"
+    result = urllib.urlopen(mkt_url).read()
+    data = {}
+    data["mktRes"] = result.strip()
+    #data = json.dumps(data, indent=4)
+    #data = json.loads(data)
+    res = makeWebhookResult2(data)
+    return res
+    
+def makeWebhookResult2(data):
+    result = data["mktRes"]
+    if result is None:
+        return {}
+    
+    # print(json.dumps(item, indent=4))
+
+    speech = result
+
+    print("Response:")
+    print(speech)
+
+    return {
+        "speech": speech,
+        "displayText": speech,
+        # "data": data,
+        # "contextOut": [],
+        "source": "apiai-weather-webhook-sample"
+    }
 
 def processRequest(req):
     if req.get("result").get("action") != "yahooWeatherForecast":
@@ -40,7 +71,6 @@ def processRequest(req):
     data = json.loads(result)
     res = makeWebhookResult(data)
     return res
-
 
 def makeYqlQuery(req):
     result = req.get("result")
@@ -75,7 +105,7 @@ def makeWebhookResult(data):
     if condition is None:
         return {}
 
-    # print(json.dumps(item, indent=4))
+    print(json.dumps(item, indent=4))
 
     speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
              ", the temperature is " + condition.get('temp') + " " + units.get('temperature')
