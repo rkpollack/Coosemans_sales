@@ -30,17 +30,18 @@ def webhook():
 def processRequest2(req):
     if req.get("result").get("action") != "coosemansMarketSales":
         return {}
-    mkt_url = "http://1webblvd.com/mktsale5.php"
+    baseurl = "http://1webblvd.com/sales.php?"
+    mkt_url = baseurl + urllib.urlencode({'ort': req.get("result").get("parameters").get("ort")}) + "&format=json"
     result = urllib.urlopen(mkt_url).read()
     data = {}
-    data["mktRes"] = result.strip()
+    data["ortRes"] = result.strip()
     #data = json.dumps(data, indent=4)
     #data = json.loads(data)
     res = makeWebhookResult2(data)
     return res
     
 def makeWebhookResult2(data):
-    result = data["mktRes"]
+    result = data["ortRes"]
     if result is None:
         return {}
     
